@@ -1,14 +1,17 @@
 import sqlite3
 import sys
 
-from PyQt5 import uic, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QDialog
+from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QMainWindow, QApplication, \
+    QTableWidgetItem, QDialog
+from main_win import Ui_MainWindow as mW
+from addEditCoffeeForm import Ui_Dialog as dF
 
 
-class CoffeeShop(QMainWindow):
+class CoffeeShop(mW, QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('main.ui', self)
+        self.setupUi(self)
 
         self.titles = []
         self.coffee_dialog = None
@@ -19,7 +22,7 @@ class CoffeeShop(QMainWindow):
         self.load_database()
 
     def load_database(self):
-        connection = sqlite3.connect('coffee.sqlite')
+        connection = sqlite3.connect('data/coffee.sqlite')
         cursor = connection.cursor()
         result = cursor.execute("""SELECT coffee_information.id, coffee_information.sort_name, 
                                     roast_degree.degree_value, coffee_information.is_powder,
@@ -57,10 +60,10 @@ class CoffeeShop(QMainWindow):
                 self.statusbar.showMessage('Выберите редактируемый сорт')
 
 
-class AddEditCoffee(QDialog):
+class AddEditCoffee(dF, QDialog):
     def __init__(self, main_window, ids=None):
         super().__init__()
-        uic.loadUi('addEditCoffeeForm.ui', self)
+        self.setupUi(self)
 
         self.main_win = main_window
 
@@ -69,7 +72,7 @@ class AddEditCoffee(QDialog):
         else:
             self.ids = False
 
-        connection = sqlite3.connect('coffee.sqlite')
+        connection = sqlite3.connect('data/coffee.sqlite')
         cursor = connection.cursor()
 
         self.roasts = cursor.execute("""SELECT * FROM roast_degree""").fetchall()
@@ -101,7 +104,7 @@ class AddEditCoffee(QDialog):
             self.ok_btn.clicked.connect(self.ok_ret_add)
 
     def ok_ret_add(self):
-        connection = sqlite3.connect('coffee.sqlite')
+        connection = sqlite3.connect('data/coffee.sqlite')
         cursor = connection.cursor()
 
         for i in self.roasts:
@@ -121,7 +124,7 @@ class AddEditCoffee(QDialog):
         self.main_win.load_database()
 
     def ok_ret_edit(self):
-        connection = sqlite3.connect('coffee.sqlite')
+        connection = sqlite3.connect('data/coffee.sqlite')
         cursor = connection.cursor()
 
         for i in self.roasts:
